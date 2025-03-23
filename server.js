@@ -5,17 +5,18 @@ const app = express();
 const PORT = 3000;
 const DATA_FILE = path.join(__dirname, 'data.json');
 
-// JSON ma'lumotlarini o'qish imkoniyatini beradi
+// JSON ma'lumotlarini o‘qish uchun middleware
 app.use(express.json());
-// Frontend fayllarini serve qilish uchun
+
+// Frontend fayllarini serve qilish
 app.use(express.static(__dirname));
 
-// Agar `data.json` fayli mavjud bo'lmasa, uni yaratish
+// Agar `data.json` mavjud bo‘lmasa, uni yaratish
 if (!fs.existsSync(DATA_FILE)) {
     fs.writeFileSync(DATA_FILE, JSON.stringify([]));
 }
 
-// POST so'rovlarini qabul qiluvchi marshrut
+// POST so‘rovlarni qabul qilish
 app.post('/post_data', (req, res) => {
     try {
         const incomingData = req.body;
@@ -24,14 +25,14 @@ app.post('/post_data', (req, res) => {
             return res.status(400).json({ error: 'Hech qanday ma\'lumot yuborilmadi' });
         }
 
-        // Vaqt tamg'asini qo'shish
+        // Vaqt tamg'asini qo‘shish
         incomingData.timestamp = new Date().toISOString();
 
-        // Avvalgi ma'lumotlarni o'qish
+        // Avvalgi ma'lumotlarni o‘qish
         const fileData = fs.readFileSync(DATA_FILE, 'utf8');
         const data = JSON.parse(fileData);
 
-        // Yangi ma'lumotni qo'shish
+        // Yangi ma'lumotni qo‘shish
         data.push(incomingData);
 
         // Ma'lumotlarni faylga yozish
